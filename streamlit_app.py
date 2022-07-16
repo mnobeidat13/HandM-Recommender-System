@@ -32,7 +32,10 @@ def main():
         
     sidebar_header = '''This is a demo to illustrate a recommender system that finds similar items to a given clothing article or recommend items for a customer using 4 different approaches:'''
     
-    page_options = ["Find similar items to a given item","Recommend items for a customer given his purchase history", 'Documentation']
+    page_options = ["Find similar items",
+                    "Customer Recommendations",
+                    "Product Captioning",
+                    'Documentation']
     
     st.sidebar.info(sidebar_header)
 
@@ -52,8 +55,11 @@ def main():
                   'Features embeddings are calculated by one-hot encoding the descriptive features provided by H&M',
                   'TFRS model performes a collaborative filtering based ranking using a neural network', 
                   'A concatenation of all embeddings above is used to find similar items']
-    
-    if page_selection == "Find similar items to a given item":
+
+#########################################################################################
+#########################################################################################
+
+    if page_selection == "Find similar items":
 
         articles_rcmnds = pd.read_csv('results/articles_rcmnds.csv')
 
@@ -91,15 +97,52 @@ def main():
                                 st.image(img, use_column_width=True)
                                 if model == 'Similar items based on text embeddings':
                                     st.caption(detail_desc)
-    
-                                
-                    
-                    
-    if page_selection == "Recommend items for a customer given his purchase history":
+                                    
+#########################################################################################
+#########################################################################################
+
+    if page_selection == "Product Captioning": 
+        captions = pd.read_csv('caption_desc_embeds.csv', dtype={'id':str}).drop('Unnamed: 0', axis=1)
         
+        
+        get_item = st.sidebar.button('Get Random Item')      
+        
+        st.sidebar.warning('In this section you get try a transformer based model that generates product captions given its image')
+        
+            
+        if get_item:
+            
+            
+            
+            rand_article = np.random.choice(captions.id)
+            desc = captions[captions.id == rand_article].desc.iloc[0]
+            caption = captions[captions.id == rand_article].caption.iloc[0].capitalize()
+            
+            cols = st.columns(2)
+            with cols[0]:
+                st.image(get_item_image(str(rand_article[1:]), resize=True, width=300, height=400))
+            with cols[1]:
+                with st.expander('Actual Product Description', expanded=True):
+                    components.html(f"""
+           <header>
+            <h4 style="color: #253f4e;">{desc}</h4>
+           </header>
+            """)
+                
+                with st.expander('Generated Product Description', expanded=True):
+                     components.html(f"""
+           <header>
+            <h4 style="color: #253f4e;">{caption}</h4>
+           </header>
+            """)
+            
+            
+            
+#########################################################################################
+#########################################################################################
+    if page_selection == "Customer Recommendations":
         
         customers_rcmnds = pd.read_csv('results/customers_rcmnds.csv')
-
         customers = customers_rcmnds.customer.unique()        
         
         get_item = st.sidebar.button('Get Random Customer')
@@ -141,7 +184,9 @@ def main():
                                 st.image(img, use_column_width=True)
                                 
 
-                            
+#########################################################################################  
+#########################################################################################
+
     if page_selection == "Documentation":
 
         with st.container():
@@ -202,6 +247,15 @@ def main():
         <a href="https://developers.google.com/machine-learning/recommendation", target="_blank">Google Developers.</a> 
         <br>
 
+        <br>
+        <br>
+        In product captioning section, I used a transformer based model that generates captions given product images as input. Captions are capped             at 10 words.
+        <br>
+        Follow the tutorial on Keras Code Examples website:
+        <a href="https://keras.io/examples/vision/image_captioning/", target="_blank">Image Captioning.</a> 
+
+        <br>
+        
         <h2>A list of notebooks and datasets used in this project</h2>
         <ul>
         
@@ -273,6 +327,15 @@ def main():
         https://www.kaggle.com/code/mohammedobeidat/comparing-4-different-approaches</a> 
         </li>
         
+        <br>
+        <li>
+        
+        Prodcuct Captioning
+
+        <a href="https://www.kaggle.com/code/mohammedobeidat/h-m-product-captioning", target="_blank">
+        https://www.kaggle.com/code/mohammedobeidat/h-m-product-captioning</a> 
+        </li>
+        
         </ul>
         </header>
         
@@ -281,10 +344,6 @@ def main():
             """,
             height=1000,
 )
-
-        
-
-
 
 if __name__ == '__main__':
     main()
