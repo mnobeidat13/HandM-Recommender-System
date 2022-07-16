@@ -4,14 +4,16 @@ import numpy as np
 import pandas as pd
 
 
-def get_item_image(item_id, width=100, height = 150):
+def get_item_image(item_id, resize=True, width=100, height = 150):
     
     path = 'results/images/'+item_id+'.jpeg'
     image = Image.open(path)
-    basewidth = width
-    wpercent = (basewidth / float(image.size[0]))
-    hsize = int((float(image.size[1]) * float(wpercent)))
-    image = image.resize((width, height), Image.ANTIALIAS)
+    
+    if resize:
+        basewidth = width
+        wpercent = (basewidth / float(image.size[0]))
+        hsize = int((float(image.size[1]) * float(wpercent)))
+        image = image.resize((width, height), Image.ANTIALIAS)
     image = ImageOps.expand(image, 2)
         
     return image    
